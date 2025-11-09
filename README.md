@@ -109,6 +109,12 @@ byte[] data = blocks.get(0).block;
 ### Demo app
 If you want a working example app you can fork, have a look at our [chat example](https://github.com/Peergos/nabu-chat). This is a simple CLI app where two users exchange peerid (out of band) and then connect and send messages via p2p http requests, which are printed to the console.
 
+For a minimal illustration bundled with this repository, check `org.peergos.examples.chat.RepositoryChatExample`. It creates a lightweight chat conversation that persists messages in local IPFS blockstores using the repository pattern. You can run it with:
+
+```
+mvn -q -DskipTests compile exec:java -Dexec.mainClass=org.peergos.examples.chat.RepositoryChatExample
+```
+
 ### S3 Blockstore
 
 By default, Nabu will construct a File based blockstore
