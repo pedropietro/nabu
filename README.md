@@ -106,7 +106,31 @@ List<HashedBlock> blocks = ipfs.getBlocks(wants, retrieveFrom, addToLocal);
 byte[] data = blocks.get(0).block;
 ```
 ### Demo app
-If you want a working example app you can fork, have a look at our [chat example](https://github.com/Peergos/nabu-chat). This is a simple CLI app where two users exchange peerid (out of band) and then connect and send messages via p2p http requests, which are printed to the console.
+If you want a working example app you can fork, have a look at our [chat example](https://github.com/Peergos/nabu-chat). This is a simple CLI app where two users exchange peerid (out of band) and then connect and send messages via p2p http requests, which are printed to the console. The same program is `examples.Chat` in this repo.
+
+### Examples
+The programs in `examples/` show a libp2p HTTP chat and the IPFS data plane: a CID, provider records, an IPNS name, and the Kubo-compatible block API. They are a separate Maven project, so they stay out of the Nabu jar.
+
+```
+mvn install -DskipTests
+mvn -f examples/pom.xml package
+```
+
+Run a class from the repo root:
+
+```
+mvn -f examples/pom.xml exec:java -Dexec.mainClass=examples.Drop -Dexec.args="put hello.txt"
+```
+
+* **Chat** (`examples.Chat`) — p2p HTTP. Each line is a POST body delivered to the other peer, and incoming bodies are printed. `Chat --bootstrap <multiaddr>` dials the Listening line from the other process. With no flag, paste a PeerId or a multiaddr; `--public` resolves a PeerId through the public DHT.
+* **Drop** (`examples.Drop`) — content addressing and Bitswap. `put` stores bytes as a raw sha2-256 CID and stays up. `get <multiaddr> <cid>` dials that peer and fetches the block. Bootstrap stays empty.
+* **Find** (`examples.Find`) — provider records. Start `get` first and copy the multiaddr it prints. Start `put --bootstrap <multiaddr>`. `put` stores the block and announces it. `get` reads only a CID, prints the provider records, then fetches with an empty peer set. `--public` on both sides uses the default public bootstrap list; that path needs reachable peers and can take a while.
+* **Name** (`examples.Name`) — IPNS. Start `resolve` first. Start `publish --bootstrap <multiaddr>`. Each line is a new raw block and a higher IPNS sequence under the publisher PeerId. `resolve` prints the current CID and the bytes. `get <cid>` on an older CID still returns that text: the name moved, the block stayed. `--public` uses the public bootstrap list.
+* **API** — [examples/api.md](examples/api.md) is a curl script for `block/put`, `block/get`, `id`, and `dht/findprovs` on a running Nabu (default `127.0.0.1:5001`). `examples.ApiBlocks` makes the same calls through `NabuClient`. Compare the CID with Kubo `ipfs block put --format=raw` on the same file bytes.
+
+The CID is the hash of the exact bytes. A trailing newline is part of the block.
+
+Scripts that run each example on one machine are documented in [examples/scripts/README.md](examples/scripts/README.md).
 
 ### S3 Blockstore
 

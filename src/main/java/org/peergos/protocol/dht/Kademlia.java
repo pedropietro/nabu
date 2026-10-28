@@ -284,6 +284,15 @@ public class Kademlia extends StrictProtocolBinding<KademliaController> implemen
         Id keyId = Id.create(key, 256);
         List<PeerAddresses> providers = new ArrayList<>();
         providers.addAll(engine.getProviders(block));
+        // ADD_PROVIDER stores the bare multihash. A CID v1 hashes differently, so the map
+        // lookup above misses the record the node itself was just given.
+        Multihash bare = block.bareMultihash();
+        if (bare != block) {
+            for (PeerAddresses extra : engine.getProviders(bare)) {
+                if (providers.stream().noneMatch(p -> p.peerId.equals(extra.peerId)))
+                    providers.add(extra);
+            }
+        }
 
         SortedSet<RoutingEntry> toQuery = new TreeSet<>((a, b) -> b.key.getSharedPrefixLength(keyId) - a.key.getSharedPrefixLength(keyId));
         toQuery.addAll(engine.getKClosestPeers(key, 20).stream()

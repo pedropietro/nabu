@@ -4,6 +4,7 @@ dist/*
 out/*
 log/*
 target/*
+examples/target/
 .idea/*
 *.iml
 *.hprof

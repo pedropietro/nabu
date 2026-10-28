@@ -31,7 +31,9 @@ public class BitswapBlockService implements BlockService {
                     .stream()
                     .flatMap(f -> {
                         try {
-                            return java.util.stream.Stream.of(f.orTimeout(10, TimeUnit.SECONDS).join());
+                            // get(timeout) leaves the want future open. orTimeout would complete it
+                            // and the provider fallback below would join an already-failed want.
+                            return java.util.stream.Stream.of(f.get(10, TimeUnit.SECONDS));
                         } catch (Exception e) {
                             return java.util.stream.Stream.empty();
                         }

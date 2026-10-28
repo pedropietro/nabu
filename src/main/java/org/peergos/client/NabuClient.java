@@ -141,6 +141,8 @@ public class NabuClient {
         List<PeerAddresses> providers = new ArrayList<>();
         for (Map<String, Object> entry : results) {
             Map<String, Object> responses = (Map<String, Object>)entry.get("Responses");
+            if (responses == null || responses.get("ID") == null)
+                continue;
             Multihash peerId = Multihash.fromBase58((String) responses.get("ID"));
             ArrayList<String> addrs = (ArrayList<String>)responses.get("Addrs");
             List<Multiaddr> peerAddresses = addrs.stream().map(a -> Multiaddr.fromString(a)).collect(Collectors.toList());
