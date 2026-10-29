@@ -130,7 +130,7 @@ mvn -f examples/pom.xml exec:java -Dexec.mainClass=examples.Drop -Dexec.args="pu
 
 The CID is the hash of the exact bytes. A trailing newline is part of the block.
 
-Scripts that run each example on one machine are documented in [examples/scripts/README.md](examples/scripts/README.md).
+Scripts that run each example on one machine, including the full suite and the run that skips the daemon when ports 4001, 5001, and 9100 are busy, are documented in [examples/scripts/README.md](examples/scripts/README.md).
 
 ### S3 Blockstore
 

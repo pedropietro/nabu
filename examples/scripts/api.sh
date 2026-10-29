@@ -14,9 +14,9 @@ out="$WORK/nabu.out"
 : >"$out"
 
 if command -v setsid >/dev/null 2>&1; then
-    setsid java -cp "$jar" org.peergos.Nabu -IPFS_PATH "$repo" >"$out" 2>&1 &
+    setsid java -cp "$(java_path "$jar")" org.peergos.Nabu -IPFS_PATH "$(java_path "$repo")" </dev/null >"$out" 2>&1 &
 else
-    java -cp "$jar" org.peergos.Nabu -IPFS_PATH "$repo" >"$out" 2>&1 &
+    java -cp "$(java_path "$jar")" org.peergos.Nabu -IPFS_PATH "$(java_path "$repo")" </dev/null >"$out" 2>&1 &
 fi
 pid=$!
 PIDS+=("$pid")
@@ -28,8 +28,11 @@ wait_out api "RPC API server" 180
 payload="$WORK/api.txt"
 write_bytes "$payload" "api-bytes"
 client="$WORK/api-client.out"
-mvn -f "$ROOT/examples/pom.xml" -q exec:java \
+# A drive-letter path next to /ip4/127.0.0.1 in one argument is rewritten by Git Bash.
+# The path is relative to the repository root, which is the Maven working directory.
+rel="${payload#"$ROOT"/}"
+MSYS2_ARG_CONV_EXCL='-Dexec.args' mvn -f "$ROOT/examples/pom.xml" -q exec:java \
     -Dexec.mainClass=examples.ApiBlocks \
-    "-Dexec.args=/ip4/127.0.0.1/tcp/5001 ${payload}" >"$client" 2>&1
+    "-Dexec.args=/ip4/127.0.0.1/tcp/5001 ${rel}" >"$client" 2>&1
 grep -q "block/get matches block/put" "$client"
 echo "PASS api"
