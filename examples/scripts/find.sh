@@ -12,7 +12,7 @@ start_node find_get examples.Find "get"
 wait_out find_get "Listening: " 90
 listen="$(field find_get Listening)"
 
-start_node find_put examples.Find "put --bootstrap ${listen} ${payload}"
+start_node find_put examples.Find "put --bootstrap ${listen} $(java_path "$payload")"
 wait_out find_put "CID: " 120
 cid="$(field find_put CID)"
 
